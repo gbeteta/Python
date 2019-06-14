@@ -1,0 +1,32 @@
+<!--This is the header of the website
+It is responsible for the links to different pages of the website that you see at the top of every page-->
+<html>
+    <head>
+    </head>
+    <body>
+    <!--code to flash methods found here
+    https://gist.github.com/damyanbogoev/a60fdd159f0b579e482d2ca577be6270#file-layout-htm
+    -->
+    {% with messages = get_flashed_messages() %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for message in messages %}
+                    <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+        {%  block content %}{% endblock %}
+        <!--gap between page content and links at the bottom of the page-->
+        <br><br>
+        <!--Horizontal Line above the links-->
+        <hr><hr>
+        <!--Links to all the different pages across the website-->
+        <div><p><a href = "{{  url_for('home') }}">Home</a></p></div>
+        <p><a href = "{{  url_for('Team_Members') }}">Team Members</a></p>
+        <p><a href = "{{  url_for('stocks') }}">Stocks</a></p>
+
+
+
+    </body>
+</html>

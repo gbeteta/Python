@@ -1,0 +1,12 @@
+<!--html for the data page or whatever we want to name it
+enter data into bar, create graph on this page-->
+{%  extends "header.html" %}
+{% block content %}
+    <h1>Stocks</h1>
+    <p>Enter name of company you want to display the candlestick graph of stocks for</p>
+    <form method = "POST" action = "{{  url_for('stocks') }}">
+        {{ form.csrf_token }}
+        {{ form.company }}
+    </form>
+    <input type="submit" value="Create Graph">
+{% endblock %}
