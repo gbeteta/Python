@@ -1,0 +1,11 @@
+<!--html for the company page
+company logo and stock candlestick graph will be displayed here-->
+{%  extends "header.html" %}
+{% block content %}
+    <h1>{{ name.title() }} &#160({{ abb }})</h1>                <!--Dynamically displays company name and stock abbreviation at the top of the page-->
+    <p>
+    <img src = "/static/pictures/{{ logo }}" alt = 'company_logo' width = 300 height = 300>     <!--Dynamically displays company logo above graph-->
+    </p>
+    <br><br>
+    <body>This is where the candlestick graph will go</body>
+{% endblock %}
