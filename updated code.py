@@ -14,6 +14,23 @@ def plot():
 
     start=datetime.datetime(2015,11,1)
     end=datetime.datetime(2016,3,10)
+    
+    
+    
+    
+x=int(input("Enter the start year: "))
+y=int(input("Enter the start month(1-12): "))
+z=int(input("Enter the start day: "))
+start=datetime.datetime(x,y,z)
+now=datetime.datetime.now()
+a=now.year
+b=now.month
+c=now.day
+end=datetime.datetime(a,b,c)
+name=input("Enter the ticker name:")
+print("Stock is:", name)
+
+data.DataReader(name=name,data_source="yahoo",start=start,end=end)
 
     df=data.get_data_yahoo(tickers="GOOG", start=start, end=end)
 
