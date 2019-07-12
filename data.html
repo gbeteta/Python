@@ -4,17 +4,20 @@ enter data into bar, create graph on this page-->
 {% block content %}
     <h1>Stocks</h1>
     <p>Enter name of company you want to display the candlestick graph of stocks for</p>
-    <p>Then press <b>Enter</b></p>
     <form method = "POST" action = "{{  url_for('stocks') }}">
         {{ form.csrf_token }}
         {{ form.company }}
+        <br>
+        {{ form.csrf_token }}
+        {{ form.submit }}
     </form>
     <br>
     <!--All the &#160's are spaces used to format the list of companies that the user can input-->
-    <p>Tesla &#160 &#160 &#160 &#160 &#160 &#160 &#160 Amazon &#160 &#160 &#160 &#160 &#160 Apple</p>
-    <p>Google &#160 &#160 &#160 &#160 &#160 Starbucks &#160 &#160 &#160 &#160 Nike</p>
-    <p>Microsoft &#160 &#160 &#160 Facebook &#160 &#160 &#160 &#160 ExxonMobil</p>
-    <p>Disney &#160 &#160 &#160 &#160 &#160 Walmart &#160 &#160 &#160 &#160 &#160 Visa</p>
-    <p>McDonalds &#160 &#160 Intel &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Nintendo</p>
+    <p>Amazon &#160 &#160 &#160 &#160 &#160 &#160 Apple &#160 &#160 &#160 &#160 &#160 &#160 &#160 Disney</p>
+    <p>ExxonMobil &#160 &#160 &#160 Facebook &#160 &#160 &#160 &#160 Google</p>
+    <p>Intel &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 McDonalds &#160 &#160 &#160 Microsoft</p>
+    <p>Nike &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Nintendo &#160 &#160 &#160 &#160 &#160 Starbucks</p>
+    <p>Tesla &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Visa &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Walmart</p>
+
     <!--<input type="submit" value="Create Graph">        couldn't get submit button working, but pressing enter does-->
 {% endblock %}

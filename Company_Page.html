@@ -2,10 +2,26 @@
 company logo and stock candlestick graph will be displayed here-->
 {%  extends "header.html" %}
 {% block content %}
-    <h1>{{ name.title() }} &#160({{ abb }})</h1>                <!--Dynamically displays company name and stock abbreviation at the top of the page-->
+    <h1>{{ name.title() }} &#160 ({{ abb }})</h1>                <!--Dynamically displays company name and stock abbreviation at the top of the page-->
     <p>
     <img src = "/static/pictures/{{ logo }}" alt = 'company_logo' width = 300 height = 300>     <!--Dynamically displays company logo above graph-->
     </p>
     <br><br>
-    <body>This is where the candlestick graph will go</body>
+    <form method = "POST" action = "">
+        Enter the Start Year
+        {{ form.csrf_token }}
+        {{ form.startyear }}
+        <br>
+        Enter the Start Month(1-12)
+        {{ form.csrf_token }}
+        {{ form.startmonth }}
+        <br>
+        Enter the Start Day
+        {{ form.csrf_token }}
+        {{ form.startday }}
+        <br>
+        {{ form.csrf_token }}
+        {{ form.submit }}
+    </form>
+
 {% endblock %}
