@@ -3,6 +3,7 @@ enter data into bar, create graph on this page-->
 {%  extends "header.html" %}
 {% block content %}
     <h1>Stocks</h1>
+    <div class="container-fluid">
     <p>Enter name of company you want to display the candlestick graph of stocks for</p>
     <form method = "POST" action = "{{  url_for('stocks') }}">
         {{ form.csrf_token }}
@@ -18,6 +19,7 @@ enter data into bar, create graph on this page-->
     <p>Intel &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 McDonalds &#160 &#160 &#160 Microsoft</p>
     <p>Nike &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Nintendo &#160 &#160 &#160 &#160 &#160 Starbucks</p>
     <p>Tesla &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Visa &#160 &#160 &#160 &#160 &#160 &#160 &#160 &#160 Walmart</p>
+</div>
 
     <!--<input type="submit" value="Create Graph">        couldn't get submit button working, but pressing enter does-->
 {% endblock %}
