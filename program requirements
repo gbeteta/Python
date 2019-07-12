@@ -1,0 +1,17 @@
+bokeh
+Flask
+gunicorn
+itsdangerous
+Jinja2
+MarkupSafe
+numpy
+pandas
+pandas-datareader
+python-dateutil
+pytz
+PyYAML
+requests
+requests-file
+six
+tornado
+Werkzeug
