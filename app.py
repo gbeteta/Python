@@ -26,6 +26,18 @@ companydict = {'tesla': ('TSLA', 'tesla_logo.jpg'), 'amazon': ('AMZN', 'amazon_l
 abbdict = {'tsla': 'tesla', 'amzn':'amazon', 'aapl':'apple', 'goog':'google', 'sbux':'starbucks', 'nke':'nike', 'msft':'microsoft',
            'fb':'facebook', 'xom':'exxonmobil', 'dis':'disney', 'wmt':'walmart', 'v':'visa', 'mcd': 'mcdonalds', 'intc':'intel', 'ntdoy':'nintendo'}
 
+monthdaydict = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}                          #Dictionary telling how many days are in each month used for error checking later on (yes problems would occur here with leap days)
+
+
+def valid_date(year1, month1, day1, year2, month2, day2):               #function that Andres and Diego wrote that checks if datetime 1 comes before 2
+    date1 = datetime.datetime(year1, month1, day1)
+    date2 = datetime.datetime(year2, month2, day2)
+    if date2 >= date1:
+        return True
+    else:
+        return False
+
+
 @app.route("/")
 @app.route("/Home")                                         #Home Page
 def home():                                                 #just returns the html template for this page
@@ -57,24 +69,55 @@ def Company_Page(name):
     abb = companydict[name][0]                                                  #grabs the stock abbreviation that corresponds to the company name from the company dictionary
     logo = companydict[name][1]                                                 #grabs the logo picture file extension that corresponds to the company name from the company dictionary
     form = DateTicker()                                                                 #wt form that gets the year, month, and day that you want your stock market data to start at
+
+    #Prefilling end day with the current day. User can change it afterwards if they want to
+    if request.method == "GET":
+        now = datetime.datetime.now()
+        form.endyear.data = now.year
+        form.endmonth.data = now.month
+        form.endday.data = now.day
+
     if form.validate_on_submit():
-        #beginning of the code that andres and diego wrote to get stock market data from yahoo
+        message = ' '                                                                                 #Used for displaying error messages. Default no error message
+        # Beginning of the code that andres and diego wrote to get stock market data from yahoo (with James's error checking and message system)
+        now = datetime.datetime.now()                                                               #creating a datetime object to represent the present. Used to check if inputted start and end dates have already happened and aren't in the future
+        currentyear = now.year
+        currentmonth = now.month
+        currentday = now.day
+        current = datetime.datetime(currentyear, currentmonth, currentday)
+
         startyear = form.startyear.data                                                             #getting the data that was submitted in the wt form
         startmonth = form.startmonth.data
         startday = form.startday.data
-        now = datetime.datetime.now()                                                               #creating a datetime object to represent the present to be passed to the pandas datareader
-        a = now.year
-        b = now.month
-        c = now.day
-        start = datetime.datetime(startyear, startmonth, startday)                                  #start getting stock data at the start date
-        end = datetime.datetime(a, b, c)                                                                        #up until the current day
-        AlltheData = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)           #***** this bit of code is what grabs the stock data from yahoo *****
-        #end of andres and diego's code
-        return render_template('Plot.html', name=name, AlltheData=AlltheData)                       #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
-    return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                           #passes the company name, abbreviation, and logo file extension to the html file so that
+        endyear = form.endyear.data
+        endmonth = form.endmonth.data
+        endday = form.endday.data
+
+        #Error checking dates. If there are any issues with the inputted dates then return a link to the company page that they were already on
+        if startmonth > 12 or startmonth < 1 or endmonth > 12 or endmonth < 1:                                                #checking if valid month was inputted
+            message = 'Error: Please enter a valid month (1-12)'
+            return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif startday < 1 or endday < 1 or monthdaydict[startmonth] < startday or monthdaydict[endmonth] < endday:            #checking that the day enter exists in the month that was entered
+            message = 'Error: Enter a valid day number for the month you inputted'
+            return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif valid_date(startyear, startmonth, startday, currentyear, currentmonth, currentday) == False:                     #checking that the start day isn't in the future
+            message = 'Error: Please enter a start day that is not in the future'
+            return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif valid_date(endyear, endmonth, endday, currentyear, currentmonth, currentday) == False:                           #checking that the end day isn't in the future
+            message = 'Error: Please enter an end day that is not in the future'
+            return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif valid_date(startyear, startmonth, startday, endyear, endmonth, endday) == False:                                 #checking that the startday comes before the end day
+            message = 'Error: Please enter a start day that comes before the end day'
+            return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+
+        #Valid Input so going out to yahoo to get the stock data
+        else:
+            start = datetime.datetime(startyear, startmonth, startday)                                                          #start getting stock data at the start date
+            end = datetime.datetime(endyear, endmonth, endday)                                                                  #up until the current day
+            AlltheData = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)                                   #***** this bit of code is what grabs the stock data from yahoo *****
+            return render_template('Plot.html', name=name, AlltheData=AlltheData)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
+    return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                                   #passes the company name, abbreviation, and logo file extension to the html file so that
                                                                                                                                 #the web page can be dynamically rendered with company specifics on it
-
-
 
 if __name__ == '__main__':                                  #main
    app.run(debug= True)

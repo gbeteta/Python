@@ -14,6 +14,8 @@ class DateTicker(FlaskForm):
     startyear = IntegerField('Enter the Start Year', validators=[DataRequired()])
     startmonth = IntegerField('Enter the Start Month(1-12)', validators=[DataRequired()])
     startday = IntegerField('Enter the Start Day', validators=[DataRequired()])
+    endyear = IntegerField('Enter the End Year', validators=[DataRequired()])
+    endmonth = IntegerField('Enter the End Month(1-12)', validators=[DataRequired()])
+    endday = IntegerField('Enter the End Day', validators=[DataRequired()])
     submit = SubmitField(label = 'Submit')
-
 
