@@ -26,7 +26,7 @@ companydict = {'tesla': ('TSLA', 'tesla_logo.jpg'), 'amazon': ('AMZN', 'amazon_l
 abbdict = {'tsla': 'tesla', 'amzn':'amazon', 'aapl':'apple', 'goog':'google', 'sbux':'starbucks', 'nke':'nike', 'msft':'microsoft',
            'fb':'facebook', 'xom':'exxonmobil', 'dis':'disney', 'wmt':'walmart', 'v':'visa', 'mcd': 'mcdonalds', 'intc':'intel', 'ntdoy':'nintendo'}
 
-monthdaydict = {1:31, 2:28, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}                          #Dictionary telling how many days are in each month used for error checking later on (yes problems would occur here with leap days)
+monthdaydict = {1:31, 2:29, 3:31, 4:30, 5:31, 6:30, 7:31, 8:31, 9:30, 10:31, 11:30, 12:31}                          #Dictionary telling how many days are in each month used for error checking later on (yes problems would occur here with leap days)
 
 
 def valid_date(year1, month1, day1, year2, month2, day2):               #function that Andres and Diego wrote that checks if datetime 1 comes before 2
@@ -97,6 +97,20 @@ def Company_Page(name):
         if startmonth > 12 or startmonth < 1 or endmonth > 12 or endmonth < 1:                                                #checking if valid month was inputted
             message = 'Error: Please enter a valid month (1-12)'
             return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif startmonth == 2 and startday == 29:                                                                              #checking leap year for start day
+            if startyear % 4 != 0:
+                message = 'Error: That year does not have a leap day'
+                return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+            elif startyear % 100 == 0 and startyear % 400 != 0:
+                    message = 'Error: That year does not have a leap day'
+                    return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+        elif endmonth == 2 and endday == 29:                                                                                  #checking leap year for end day
+            if endyear % 4 != 0:
+                message = 'Error: That year does not have a leap day'
+                return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
+            elif endyear % 100 == 0 and endyear % 400 != 0:
+                    message = 'Error: That year does not have a leap day'
+                    return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
         elif startday < 1 or endday < 1 or monthdaydict[startmonth] < startday or monthdaydict[endmonth] < endday:            #checking that the day enter exists in the month that was entered
             message = 'Error: Enter a valid day number for the month you inputted'
             return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
@@ -109,13 +123,12 @@ def Company_Page(name):
         elif valid_date(startyear, startmonth, startday, endyear, endmonth, endday) == False:                                 #checking that the startday comes before the end day
             message = 'Error: Please enter a start day that comes before the end day'
             return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form, message=message)
-
         #Valid Input so going out to yahoo to get the stock data
-        else:
-            start = datetime.datetime(startyear, startmonth, startday)                                                          #start getting stock data at the start date
-            end = datetime.datetime(endyear, endmonth, endday)                                                                  #up until the current day
-            AlltheData = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)                                   #***** this bit of code is what grabs the stock data from yahoo *****
-            return render_template('Plot.html', name=name, AlltheData=AlltheData)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
+
+        start = datetime.datetime(startyear, startmonth, startday)                                                          #start getting stock data at the start date
+        end = datetime.datetime(endyear, endmonth, endday)                                                                  #up until the current day
+        AlltheData = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)                                   #***** this bit of code is what grabs the stock data from yahoo *****
+        return render_template('Plot.html', name=name, AlltheData=AlltheData)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
     return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                                   #passes the company name, abbreviation, and logo file extension to the html file so that
                                                                                                                                 #the web page can be dynamically rendered with company specifics on it
 
