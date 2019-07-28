@@ -52,17 +52,20 @@ def Team_Members():                                         #just returns the ht
 
 @app.route("/stocks", methods=['POST', 'GET'])
 def stocks():
-    form = DataForm()                                                           #creating a form object
-    if form.validate_on_submit():                                               #when the form is submitted (pressing the submit("Create Graph") button doesn't work right now, you have to just press <enter>
-        name = form.company.data.lower()                                        #convert user input to all lower case
-        if name in companydict.keys():                                              #check if the user input is one of the keys in the dictionary companydict
-            return redirect(url_for('Company_Page', name=name))                 #if valid company name redirect to custom url with extension /stocks/<companyname>
-        if name in abbdict.keys():                                                  #if user didn't type in valid company name check if they typed in the
-            name = abbdict[name]                                                #stock market abbreviation for one of the companies and associate this
-            return redirect(url_for('Company_Page', name=name))                 #abbreviation back to the company's name
-        else:                                                                       #if invalid company name print error message
-            flash('Please Enter One of the Company Names Listed Below')         #error message for typing in a company name that we aren't supporting
-    return render_template('data.html', form=form)
+    
+    form = DataForm() #creating a form object
+    content = {'Tesla': ('TSLA', 'tesla_logo.jpg'), 'Amazon': ('AMZN', 'amazon_logo.jpg'),
+    'Apple': ('AAPL', 'apple_logo.png'), 'Google': ('GOOG', 'google_logo.png'), 
+    'Starbucks': ('SBUX', 'starbucks_logo.jpg'), 'Nike': ('NKE', 'nike_logo.jpg'),
+    'Microsoft': ('MSFT', 'microsoft_logo.jpg'), 'Facebook': ('FB','facebook_logo.png'),
+    'Exxonmobil': ('XOM','exxonmobil_logo.png'), 'Disney': ('DIS', 'disney_logo.jpg'),
+    'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
+    'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
+    'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
+    name = str(request.form.get('comp_select'))#receiving the input from the user selection. 
+    if name in content.keys():
+        return redirect(url_for('Company_Page', name=name.lower()))
+    return render_template('data.html', form=form, content=content)
 
 
 @app.route("/stocks/<name>", methods=['POST', 'GET'])                                                    #dynamic url where the "<name>" part is the valid company name that the user inputted
@@ -159,7 +162,14 @@ def Company_Page(name):
         #End Andres's Graph Stuff
 
         form = DataForm()
-        return render_template('data.html', form=form)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
+        content = {'Tesla': ('TSLA', 'tesla_logo.jpg'), 'Amazon': ('AMZN', 'amazon_logo.jpg'), 'Apple': ('AAPL', 'apple_logo.png'), 'Google': ('GOOG', 'google_logo.png'),
+        'Starbucks': ('SBUX', 'starbucks_logo.jpg'), 'Nike': ('NKE', 'nike_logo.jpg'),
+        'Microsoft': ('MSFT', 'microsoft_logo.jpg'), 'Facebook': ('FB','facebook_logo.png'),
+        'Exxonmobil': ('XOM','exxonmobil_logo.png'), 'Disney': ('DIS', 'disney_logo.jpg'),
+        'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
+        'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
+        'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
+        return render_template('data.html', form=form, content=content)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
     return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                                   #passes the company name, abbreviation, and logo file extension to the html file so that
                                                                                                                                 #the web page can be dynamically rendered with company specifics on it
 

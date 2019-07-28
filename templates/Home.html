@@ -3,6 +3,27 @@ Displays Objective and about paragraphs that Andres typed up-->
 {%  extends "header.html" %}
 {% block content %}
 
+<header>
+  <section id="home" style="background-size:cover; background-position: center center;background-attachment:fixed;">
+
+ 
+    <div class="overlay"></div>
+    <video playsinline="playsinline" autoplay="autoplay" muted="muted" loop="loop">
+      <source src="https://storage.googleapis.com/coverr-main/mp4/Mt_Baker.mp4" type="video/mp4">
+    </video>
+    <div class="container h-100">
+      <div class="d-flex h-100 text-center align-items-center">
+        <div class="w-100 text-white">
+          <h1 class="display-3">Web-Based Financial Graph Application</h1>
+          <p class="lead mb-0">CIS 4930</p>
+          <br>
+          <br>
+          <p><a href="{{  url_for('stocks') }}" class="btn btn-primary btn-lg">Stocks</a></p>
+        </div>
+      </div>
+    </section>
+  </header>
+<!-- 
     <h1>Web-Based Financial Graph Application</h1>
     <br>
     <div class = "container-fluid">
@@ -22,5 +43,5 @@ Displays Objective and about paragraphs that Andres typed up-->
     it requires a lot of stylization specially with the candlestick segments
     and embedding the charts with quadrants.</p>
     </div>
-
+  -->
 {% endblock %}

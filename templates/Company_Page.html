@@ -6,6 +6,7 @@ company logo and stock candlestick graph will be displayed here-->
     <p>
     <img src = "/static/pictures/{{ logo }}" alt = 'company_logo' width = 300 height = 300>     <!--Dynamically displays company logo above graph-->
     </p>
+    <b>{{ message }}</b>
     <br><br>
     <form method = "POST" action = "">
         Enter the Start Year
@@ -20,6 +21,20 @@ company logo and stock candlestick graph will be displayed here-->
         {{ form.csrf_token }}
         {{ form.startday }}
         <br>
+        <br><br>
+        Enter the End Year
+        {{ form.csrf_token }}
+        {{ form.endyear }}
+        <br>
+        Enter the End Month(1-12)
+        {{ form.csrf_token }}
+        {{ form.endmonth }}
+        <br>
+        Enter the End Day
+        {{ form.csrf_token }}
+        {{ form.endday }}
+        <br>
+        <br><br>
         {{ form.csrf_token }}
         {{ form.submit }}
     </form>
