@@ -137,27 +137,31 @@ def Company_Page(name):
         df = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)                                   #***** this bit of code is what grabs the stock data from yahoo *****
 
         #Andres's graphing
-        def inc_dec(c, o):
-            if c > o:
+        def inc_dec(c, o):                              #Set code to display increase or decrease, this part needed help
+            if c > o:                                   #if c is greater than o then increase
                 value = "Increase"
-            elif c < o:
+            elif c < o:                                 #if 0 is greater than c then decrease
                 value = "Decrease"
             else:
-                value = "Equal"
+                value = "Equal"                         #else equal
             return value
-        df["Status"] = [inc_dec(c, o) for c, o in zip(df.Close, df.Open)]
-        df["Middle"] = (df.Open + df.Close) / 2
-        df["Height"] = abs(df.Close - df.Open)
+          
+        df["Current"] = [inc_dec(c, o) for c, o in zip(df.Close, df.Open)]      #takes the status to open and closing prices
+        df["Average"] = (df.Open + df.Close) / 2                                #divide by 2 since gains and loses
+        df["Altura"] = abs(df.Close - df.Open)                                  #set the altitude of graph by close minus open
+        
         p = figure(x_axis_type='datetime', width=1600, height=500)
-        abb = companydict[name][0]
-        p.title.text = name.capitalize() + " (" + abb + ")"
-        p.grid.grid_line_alpha = 0.4
+        abb = companydict[name][0]                                        #add the name of the company
+        p.title.text = name.capitalize() + " (" + abb + ")"           #capitalize name of the company
+        p.grid.grid_line_alpha = 0.39
         hours_12 = 12 * 60 * 60 * 1000
-        p.segment(df.index, df.High, df.index, df.Low, color="Black")
-        p.rect(df.index[df.Status == "Increase"], df.Middle[df.Status == "Increase"],
-               hours_12, df.Height[df.Status == "Increase"], fill_color="#CCFFFF", line_color="black")
-        p.rect(df.index[df.Status == "Decrease"], df.Middle[df.Status == "Decrease"],
-               hours_12, df.Height[df.Status == "Decrease"], fill_color="#FF3333", line_color="black")
+        p.segment(df.index, df.High, df.index, df.Low, color="Black")         #beginning of graph box
+        
+        p.rect(df.index[df.Current == "Increase"], df.Average[df.Current == "Increase"],      #set the color and space of increasing box
+               hours_12, df.Altura[df.Current == "Increase"], fill_color="#19e63b", line_color="black")   #use hexadecimals for colors
+        
+        p.rect(df.index[df.Current == "Decrease"], df.Average[df.Current == "Decrease"],      #set color of decrease below with hexadecimals
+               hours_12, df.Altura[df.Current == "Decrease"], fill_color="#ba0909", line_color="black")
         show(p)
         #End Andres's Graph Stuff
 
