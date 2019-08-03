@@ -22,5 +22,14 @@ I added this because that way we don't have to worry about user misinput
         
     </form>
 </div>
-
+<h2>Latest Business News</h2>
+<div class="container-fluid">
+    <ul>
+        {% for i in range(0,12) %}
+        {%if i % 2 == 0%}
+        <li><a href= "{{business_lists[i+1]}}" target="_blank">{{business_lists[i]}}</a></li>
+        {%endif%}
+        {% endfor %}
+    </ul>
+</div>
 {% endblock %}

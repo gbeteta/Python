@@ -6,7 +6,9 @@ from wtf import DataForm, DateTicker                                    #This is
 from pandas_datareader import data                                      #used to grab stock market data from a website
 import datetime                                                         #used to verify if dates are valid and to be passed to the line above ^
 from bokeh.plotting import figure, show
-
+import pandas as pd
+from bs4 import BeautifulSoup
+import requests 
 
 app = Flask(__name__)
 
@@ -62,10 +64,46 @@ def stocks():
     'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
     'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
     'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
-    name = str(request.form.get('comp_select'))#receiving the input from the user selection. 
+    name = str(request.form.get('comp_select'))#receiving the input from the user selection.
+    #news_dic = {'tsla': 'tesla', 'amzn':'amazon', 'aapl':'apple', 'goog':'google', 'sbux':'starbucks', 'nke':'nike', 'msft':'microsoft', 'fb':'facebook', 'xom':'exxonmobil', 'dis':'disney', 'wmt':'walmart', 'v':'visa', 'mcd': 'mcdonalds', 'intc':'intel', 'ntdoy':'nintendo'}
+    #newsLnk = "https://www.nasdaq.com/symbol/"
+ 
+    #name = str(request.form.get('comp_select'))#receiving the input from the user selection.
+    #newsletter = {} 
+    """
+   for (abr, cname) in news_dic.items():
+        newsLnk += abr
+        newsLnk+="/news-headlines"
+        news_page = requests.get(newsLnk)
+        soup = BeautifulSoup(news_page.content, 'html.parser')
+        newsletter[cname]=[]
+        for a in soup.find_all('a', href =True):
+            if cname in a['href']:
+                news_title = (a.get_text())
+                news_web_location = (a['href'])
+                newsletter[cname].append(news_title)
+                newsletter[cname].append(news_web_location)
+                break
+        newsLnk = "https://www.nasdaq.com/symbol/"
+
+    print (newsletter)  
+    """
+    business_news_page = requests.get("https://www.nasdaq.com/news/market-headlines.aspx")
+    soup = BeautifulSoup(business_news_page.content,'html.parser')
+    business_lists=[]
+    business_links=[]
+    for a in soup.find_all('a', {"id": "two_column_main_content_la1_rptArticles_hlArticleLink_0"}):
+        news_title = (a.get_text())
+        news_web_location = (a['href'])
+        business_lists.append(news_title)
+        business_links.append(news_web_location)
+    
+
+
     if name in content.keys():
         return redirect(url_for('Company_Page', name=name.lower()))
-    return render_template('data.html', form=form, content=content)
+    
+    return render_template('data.html', form=form, content=content, business_lists=business_lists,business_links=business_links)
 
 
 @app.route("/stocks/<name>", methods=['POST', 'GET'])                                                    #dynamic url where the "<name>" part is the valid company name that the user inputted
@@ -173,10 +211,19 @@ def Company_Page(name):
         'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
         'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
         'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
-        return render_template('data.html', form=form, content=content)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
+        business_links=[]
+        business_lists=[]
+        business_news_page = requests.get("https://www.nasdaq.com/news/market-headlines.aspx")
+        soup = BeautifulSoup(business_news_page.content,'html.parser')
+        for a in soup.find_all('a', {"id": "two_column_main_content_la1_rptArticles_hlArticleLink_0"}):
+            news_title = (a.get_text())
+            news_web_location = (a['href'])
+            business_lists.append(news_title)
+            business_links.append(news_web_location)
+
+        return render_template('data.html', form=form, content=content,business_lists=business_lists,business_links=business_links)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
     return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                                   #passes the company name, abbreviation, and logo file extension to the html file so that
                                                                                                                                 #the web page can be dynamically rendered with company specifics on it
 
 if __name__ == '__main__':                                  #main
    app.run(debug= True)
-
