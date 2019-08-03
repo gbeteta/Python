@@ -6,7 +6,9 @@ from wtf import DataForm, DateTicker                                    #This is
 from pandas_datareader import data                                      #used to grab stock market data from a website
 import datetime                                                         #used to verify if dates are valid and to be passed to the line above ^
 from bokeh.plotting import figure, show
-
+import pandas as pd
+from bs4 import BeautifulSoup
+import requests 
 
 app = Flask(__name__)
 
@@ -62,10 +64,46 @@ def stocks():
     'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
     'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
     'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
-    name = str(request.form.get('comp_select'))#receiving the input from the user selection. 
+    name = str(request.form.get('comp_select'))#receiving the input from the user selection.
+    #news_dic = {'tsla': 'tesla', 'amzn':'amazon', 'aapl':'apple', 'goog':'google', 'sbux':'starbucks', 'nke':'nike', 'msft':'microsoft', 'fb':'facebook', 'xom':'exxonmobil', 'dis':'disney', 'wmt':'walmart', 'v':'visa', 'mcd': 'mcdonalds', 'intc':'intel', 'ntdoy':'nintendo'}
+    #newsLnk = "https://www.nasdaq.com/symbol/"
+ 
+    #name = str(request.form.get('comp_select'))#receiving the input from the user selection.
+    #newsletter = {} 
+    """
+   for (abr, cname) in news_dic.items():
+        newsLnk += abr
+        newsLnk+="/news-headlines"
+        news_page = requests.get(newsLnk)
+        soup = BeautifulSoup(news_page.content, 'html.parser')
+        newsletter[cname]=[]
+        for a in soup.find_all('a', href =True):
+            if cname in a['href']:
+                news_title = (a.get_text())
+                news_web_location = (a['href'])
+                newsletter[cname].append(news_title)
+                newsletter[cname].append(news_web_location)
+                break
+        newsLnk = "https://www.nasdaq.com/symbol/"
+
+    print (newsletter)  
+    """
+    business_news_page = requests.get("https://www.nasdaq.com/news/market-headlines.aspx")
+    soup = BeautifulSoup(business_news_page.content,'html.parser')
+    business_lists=[]
+    business_links=[]
+    for a in soup.find_all('a', {"id": "two_column_main_content_la1_rptArticles_hlArticleLink_0"}):
+        news_title = (a.get_text())
+        news_web_location = (a['href'])
+        business_lists.append(news_title)
+        business_links.append(news_web_location)
+    
+
+
     if name in content.keys():
         return redirect(url_for('Company_Page', name=name.lower()))
-    return render_template('data.html', form=form, content=content)
+    
+    return render_template('data.html', form=form, content=content, business_lists=business_lists,business_links=business_links)
 
 
 @app.route("/stocks/<name>", methods=['POST', 'GET'])                                                    #dynamic url where the "<name>" part is the valid company name that the user inputted
@@ -137,27 +175,31 @@ def Company_Page(name):
         df = data.DataReader(name=abb, data_source="yahoo", start=start, end=end)                                   #***** this bit of code is what grabs the stock data from yahoo *****
 
         #Andres's graphing
-        def inc_dec(c, o):
-            if c > o:
+        def inc_dec(c, o):                              #Set code to display increase or decrease, this part needed help
+            if c > o:                                   #if c is greater than o then increase
                 value = "Increase"
-            elif c < o:
+            elif c < o:                                 #if 0 is greater than c then decrease
                 value = "Decrease"
             else:
-                value = "Equal"
+                value = "Equal"                         #else equal
             return value
-        df["Status"] = [inc_dec(c, o) for c, o in zip(df.Close, df.Open)]
-        df["Middle"] = (df.Open + df.Close) / 2
-        df["Height"] = abs(df.Close - df.Open)
+          
+        df["Current"] = [inc_dec(c, o) for c, o in zip(df.Close, df.Open)]      #takes the status to open and closing prices
+        df["Average"] = (df.Open + df.Close) / 2                                #divide by 2 since gains and loses
+        df["Altura"] = abs(df.Close - df.Open)                                  #set the altitude of graph by close minus open
+        
         p = figure(x_axis_type='datetime', width=1600, height=500)
-        abb = companydict[name][0]
-        p.title.text = name.capitalize() + " (" + abb + ")"
-        p.grid.grid_line_alpha = 0.4
+        abb = companydict[name][0]                                        #add the name of the company
+        p.title.text = name.capitalize() + " (" + abb + ")"           #capitalize name of the company
+        p.grid.grid_line_alpha = 0.39
         hours_12 = 12 * 60 * 60 * 1000
-        p.segment(df.index, df.High, df.index, df.Low, color="Black")
-        p.rect(df.index[df.Status == "Increase"], df.Middle[df.Status == "Increase"],
-               hours_12, df.Height[df.Status == "Increase"], fill_color="#CCFFFF", line_color="black")
-        p.rect(df.index[df.Status == "Decrease"], df.Middle[df.Status == "Decrease"],
-               hours_12, df.Height[df.Status == "Decrease"], fill_color="#FF3333", line_color="black")
+        p.segment(df.index, df.High, df.index, df.Low, color="Black")         #beginning of graph box
+        
+        p.rect(df.index[df.Current == "Increase"], df.Average[df.Current == "Increase"],      #set the color and space of increasing box
+               hours_12, df.Altura[df.Current == "Increase"], fill_color="#19e63b", line_color="black")   #use hexadecimals for colors
+        
+        p.rect(df.index[df.Current == "Decrease"], df.Average[df.Current == "Decrease"],      #set color of decrease below with hexadecimals
+               hours_12, df.Altura[df.Current == "Decrease"], fill_color="#ba0909", line_color="black")
         show(p)
         #End Andres's Graph Stuff
 
@@ -169,10 +211,19 @@ def Company_Page(name):
         'Walmart': ('WMT','walmart_logo.jpg'), 'Visa': ('V', 'visa_logo.png'),
         'Mcdonalds': ('MCD','mcdonalds_logo.jpg'), 'Intel': ('INTC', 'intel_logo.png'),
         'Nintendo': ('NTDOY', 'nintendo_logo.jpg')}
-        return render_template('data.html', form=form, content=content)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
+        business_links=[]
+        business_lists=[]
+        business_news_page = requests.get("https://www.nasdaq.com/news/market-headlines.aspx")
+        soup = BeautifulSoup(business_news_page.content,'html.parser')
+        for a in soup.find_all('a', {"id": "two_column_main_content_la1_rptArticles_hlArticleLink_0"}):
+            news_title = (a.get_text())
+            news_web_location = (a['href'])
+            business_lists.append(news_title)
+            business_links.append(news_web_location)
+
+        return render_template('data.html', form=form, content=content,business_lists=business_lists,business_links=business_links)                                               #displaying new html page at same url that will display the candlestick graph (right now just prints data in raw number form)
     return render_template('Company_Page.html', name=name, abb=abb, logo=logo, form=form)                                   #passes the company name, abbreviation, and logo file extension to the html file so that
                                                                                                                                 #the web page can be dynamically rendered with company specifics on it
 
 if __name__ == '__main__':                                  #main
    app.run(debug= True)
-
